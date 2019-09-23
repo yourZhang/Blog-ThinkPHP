@@ -30,11 +30,10 @@ class Users extends Model
   //找回密码
   public function getpwd($data)
   {
-    $res = $this->where('email', $data)->field('username,pwd')->select();
-    // $json = json_decode($res);
-    return $res;
-    if (count($res->msg) != 0) {
-      return $res->msg;
+    $res = $this->where('email', $data['emails'])->field('username,pwd')->select();
+    if (count($res) > 0) {
+      mailto($data['emails'], '找回密码', '您的密码:' . $res[0]->pwd . '您的帐号' . $res[0]->username);
+      return 1;
     } else {
       return 0;
     }

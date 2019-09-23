@@ -5,14 +5,13 @@ namespace app\admin\controller;
 use think\Controller;
 use think\Validate;
 use think\Db;
-use think\Model;
+use think\Session;
 
 class Index extends controller
 {
-  //登陆后台
+  //登陆后台----------------------------------------------------
   public function login()
   {
-
     if (request()->isAjax()) {
       $validate = new Validate([
         'username|用户名'  => 'require',
@@ -27,6 +26,8 @@ class Index extends controller
       }
       $res = Db::name('users')->where($data)->count();
       if ($res == 1) {
+        // sission('username', $data['username']);
+        Session::set('usernames',  $data['username']);
         $this->success('登陆成功', 'admin/home/index');
       } else {
         $this->error('用户名或密码不正确');
@@ -35,7 +36,7 @@ class Index extends controller
     return view();
   }
 
-  //注册
+  //注册--------------------------------------------------------------------------
   public function reg()
   {
     if (request()->isAjax()) {
@@ -47,6 +48,7 @@ class Index extends controller
       ];
       $res = model('Users')->reg($data);
       if ($res == 1) {
+        sission('username', $data['username']);
         $this->success('注册成功', 'admin/Index/login');
       } else {
         $this->error($res);
@@ -55,15 +57,18 @@ class Index extends controller
     return view('reg');
   }
 
-  //找回密码
+  //找回密码----------------------------------------------------------------
   public function getpwd()
   {
     if (request()->isAjax()) {
-      $data = input('post.email');
+      $data = [
+        'emails' => input('post.emails')
+      ];
       $res = model('Users')->getpwd($data);
+
       $this->success($res);
     }
-    echo $res;
+    // echo $res;
     return view();
   }
 }
